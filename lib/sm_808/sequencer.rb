@@ -1,33 +1,20 @@
-require_relative "formatters"
-
 module Sm808
   class Sequencer
-    def initialize(formatter: Formatters::Text)
-      self.samples = {}
-      self.formatter = formatter.new
+    attr_accessor :step_count
+
+    def intialize(step_count: 8)
+      @step_count = step_count
     end
 
-    def step
-      formatter.format(active_samples)
-    end
-
-    def add(sample)
-      samples[sample.kind] = sample
+    def resequence!(new_sample)
+      return unless new_sample.pattern.length > step_count
+      self.step_count = new_sample.pattern
     end
 
     private
 
-    attr_accessor :samples, :formatter
-
     def sequence
-      @sequence ||= (0..7).cycle
-    end
-
-    def active_samples
-      step_count = sequence.next
-      samples.values.select do |s|
-        s.active?(step_count)
-      end
+      @sequence ||= (0..step_count).lazy
     end
   end
 end
