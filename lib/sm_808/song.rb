@@ -1,42 +1,26 @@
-require_relative "formatters"
-
 module Sm808
   class Song
-    attr_reader :bpm, :title, :samples, :formatter
+    attr_reader :title, :samples
 
-    def initialize(bpm: 128, title: "Untitled", formatter: Formatters::Text)
-      @bmp = bpm
+    def initialize(title: "Untitled")
       @title = title
-      @samples = {}
-      @formatter = formatter.new(self)
+      @samples = default_samples
     end
 
     def add_sample(sample)
       samples[sample.kind] = sample
     end
 
-    def play
-      next_step
-      play
-    rescue StopIteration
-      formatter.fin
-    end
-
-    def next_step
-      formatter.format(sequence.next)
+    def sample(step)
+      samples.map { |kind, sample| [kind, sample.note(step)] }.to_h
     end
 
     private
 
-    # TODO: push this into object responsible for sequencing
-    def max_length
-      pattern_lengths = samples.values.map { |s| s.pattern.length }
-      pattern_lengths << 8
-      pattern_lengths.max - 1
-    end
-
-    def sequence
-      @sequence ||= (0..max_length).lazy
+    def default_samples
+      Sample::Kinds::ALL.each_with_object({}) do |kind, samples|
+        samples[kind] = Sample.new(kind, Sample::INACTIVE_STEP)
+      end
     end
   end
 end

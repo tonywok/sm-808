@@ -3,101 +3,51 @@ require "spec_helper"
 RSpec.describe Sm808::Song do
   let(:song) { described_class.new }
 
-  describe "#next_step" do
-    context "with no samples" do
-      it "loops with no samples" do
-        8.times { expect(song.next_step).to eq([]) }
-      end
-    end
-
-    context "with samples" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "0000X000") }
-      let(:hihat) { Sample.new(:hihat, "00X000X0") }
-
-      before do
-        song.add_sample(kick)
-        song.add_sample(snare)
-        song.add_sample(hihat)
-      end
-
-      it "sequences the samples" do
-        expect(song.next_step).to eq(["X", "0", "0"])
-        expect(song.next_step).to eq(["0", "0", "0"])
-        expect(song.next_step).to eq(["0", "0", "X"])
-        expect(song.next_step).to eq(["0", "0", "0"])
-        expect(song.next_step).to eq(["X", "X", "0"])
-        expect(song.next_step).to eq(["0", "0", "0"])
-        expect(song.next_step).to eq(["0", "0", "X"])
-        expect(song.next_step).to eq(["0", "0", "0"])
-      end
-    end
-
-    context "with sample added midway through" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "0XXX0XXX") }
-
-      before { song.add_sample(kick) }
-
-      it "adds starts playing on the next step" do
-        expect(song.next_step).to eq(["X"])
-        expect(song.next_step).to eq(["0"])
-        song.add_sample(snare)
-        expect(song.next_step).to eq(["0", "X"])
-        expect(song.next_step).to eq(["0", "X"])
-        expect(song.next_step).to eq(["X", "0"])
-        expect(song.next_step).to eq(["0", "X"])
-        expect(song.next_step).to eq(["0", "X"])
-        expect(song.next_step).to eq(["0", "X"])
-      end
+  describe "#title" do
+    it "defaults to untitled" do
+      expect(song.title).to eq("Untitled")
     end
   end
 
-  describe "#play" do
-    context "with no samples" do
-      it "finishes immediately" do
-        expect(song.play).to be_nil
-      end
+  describe "#samples" do
+    it "has all samples" do
+      expect(song.samples.keys).to eq(Sample::Kinds::ALL)
     end
+  end
 
-    context "with samples that have the same pattern length" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "0XXX0XXX") }
+  describe "#sample" do
+    let(:kick)  { Sample.new(:kick,  "X000X000") }
+    let(:snare) { Sample.new(:snare, "0000X000") }
+    let(:hihat) { Sample.new(:hihat, "00X000X0") }
 
-      before do
-        song.add_sample(kick)
-        song.add_sample(snare)
-      end
-
-      it "sequences both" do
-        expect(song.play).to eq(<<~TXT)
-          +---------------+
-          |X|0|0|0|X|0|0|0|
-          |0|X|X|X|0|X|X|X|
-          +---------------+
-        TXT
-      end
-    end
-
-    context "with samples of varying pattern length" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "000X00000000X000") }
-      let(:hihat) { Sample.new(:hihat, "0X") }
-
+    context "bunch of custom samples" do
       before do
         song.add_sample(kick)
         song.add_sample(snare)
         song.add_sample(hihat)
       end
 
-      it "sequences both, restarting the shorter sample" do
-        expect(song.play).to eq(<<~TXT)
-          +-------------------------------+
-          |X|0|0|0|X|0|0|0|X|0|0|0|X|0|0|0|
-          |0|0|0|X|0|0|0|0|0|0|0|0|X|0|0|0|
-          |0|X|0|X|0|X|0|X|0|X|0|X|0|X|0|X|
-          +-------------------------------+
-        TXT
+      it "extracts the active notes from each sample" do
+        notes = song.sample(0)
+        expect(notes[:kick]).to be_active
+        expect(notes[:snare]).not_to be_active
+        expect(notes[:hihat]).not_to be_active
+      end
+
+      it "gracefully handles higher step counts" do
+        notes = song.sample(10)
+        expect(notes[:kick]).not_to be_active
+        expect(notes[:snare]).not_to be_active
+        expect(notes[:hihat]).to be_active
+      end
+    end
+
+    context "no user defined samples" do
+      it "only has inactive notes" do
+        notes = song.sample(0)
+        expect(notes[:kick]).not_to be_active
+        expect(notes[:snare]).not_to be_active
+        expect(notes[:hihat]).not_to be_active
       end
     end
   end

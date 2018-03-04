@@ -3,37 +3,23 @@ require "spec_helper"
 RSpec.describe Sm808::Sample do
   let(:sample) { described_class.new(:snare, pattern) }
 
-  describe "active?" do
-    subject { sample.active?(step) }
+  describe "#duration" do
+    let(:pattern) { "XXX" }
 
-    context "with an active step" do
-      let(:pattern) { "X0000000" }
-      let(:step) { 0 }
+    it { expect(sample.duration).to eq(3) }
+  end
 
-      it { is_expected.to be_truthy }
-    end
+  describe "#note" do
+    let(:pattern) { "X0X0" }
 
-    context "with an inactive step" do
-      let(:pattern) { "0XXXXXXX" }
-      let(:step) { 0 }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context "when step is out of bounds" do
-      let(:step) { 10 }
-
-      context "after repeating onto an inactive step" do
-        let(:pattern) { "XX0XXXXX" }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context "after repeating onto an active step" do
-        let(:pattern) { "00X00000" }
-
-        it { is_expected.to be_truthy }
-      end
-    end
+    it { expect(sample.note(0)).to be_active }
+    it { expect(sample.note(1)).not_to be_active }
+    it { expect(sample.note(2)).to be_active }
+    it { expect(sample.note(3)).not_to be_active }
+    it { expect(sample.note(4)).to be_active }
+    it { expect(sample.note(5)).not_to be_active }
+    it { expect(sample.note(6)).to be_active }
+    it { expect(sample.note(7)).not_to be_active }
+    it { expect(sample.note(8)).to be_active }
   end
 end
