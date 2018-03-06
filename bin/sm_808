@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "pry"
+Bundler.setup
+require "sm_808"
+
+options = Sm808::Interfaces::Parser.parse(ARGV)
+sm808 = Sm808::DrumMachine.new(options)
+
+sm808.add_sample(Sm808::Sample.new(:kick,  "X000X000"))
+sm808.add_sample(Sm808::Sample.new(:snare, "0000X000"))
+sm808.add_sample(Sm808::Sample.new(:hihat, "00X000X0"))
+sm808.playback

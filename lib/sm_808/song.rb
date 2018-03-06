@@ -1,14 +1,29 @@
+require "sm_808/step_sequence"
+
 module Sm808
   class Song
-    attr_reader :title, :samples
+    extend Forwardable
 
-    def initialize(title: "Untitled")
+    attr_reader :title, :samples, :step_sequence
+
+    def initialize(bpm: 60, title: "Untitled")
       @title = title
       @samples = default_samples
+      @step_sequence = StepSequence.new(bpm)
+    end
+
+    def_delegator :@step_sequence, :complete?
+
+    def play(num, &block)
+      step_sequence.step_through(num) do |step|
+        notes = sample(step)
+        yield step, notes
+      end
     end
 
     def add_sample(sample)
       samples[sample.kind] = sample
+      step_sequence.resequence!(sample.duration)
     end
 
     def sample(step)

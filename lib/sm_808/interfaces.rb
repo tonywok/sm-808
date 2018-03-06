@@ -1,5 +1,6 @@
+require_relative "interfaces/parser"
 require_relative "interfaces/text"
-require_relative "interfaces/cli"
+require_relative "interfaces/demo"
 
 module Sm808
   module Interfaces

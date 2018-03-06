@@ -2,13 +2,25 @@ module Sm808
   class StepSequence
     attr_reader :duration
 
-    def initialize(default_step_count: 8)
+    DEFAULT_STEP_COUNT = 8
+
+    def initialize(bpm)
       self.current_step = 0
-      self.sequence = build_sequence(default_step_count)
+      self.bpm = bpm
+      self.sequence = build_sequence(DEFAULT_STEP_COUNT)
+    end
+
+    def step_through(num = 1)
+      num.times do
+        duration.times { yield next_step }
+        rewind
+      end
     end
 
     def next_step
-      self.current_step = sequence.next
+      self.current_step = sequence.next.tap do
+        sleep(step_duration)
+      end
     end
 
     def complete?
@@ -27,16 +39,22 @@ module Sm808
 
     private
 
-    attr_accessor :sequence, :current_step
+    attr_accessor :sequence, :current_step, :step_duration, :bpm
     attr_writer :duration
 
     def build_sequence(step_count)
       self.duration = step_count
+      self.step_duration = 60.0 / bpm * 4 / duration
       (0...duration).lazy.cycle
     end
 
     def fast_forward(destination_step)
       sequence.next until sequence.peek == destination_step
+    end
+
+    def rewind
+      sequence.rewind
+      self.current_step = sequence.peek
     end
   end
 end
