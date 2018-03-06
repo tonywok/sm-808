@@ -1,9 +1,6 @@
 module Sm808
   module Interfaces
-    class Demo
-      def on_start
-      end
-
+    class Demo < Interface
       def on_step(step, notes)
         active_notes = notes.values.select(&:active?)
 

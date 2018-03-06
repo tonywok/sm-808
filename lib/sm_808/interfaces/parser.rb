@@ -21,7 +21,6 @@ module Sm808
 
           opts.on("-i", "--interface=INTERFACE", "Available output interfaces (default: curses)") do |i|
             interface_strategy = {
-              "curses" => Sm808::Interfaces::Cli,
               "demo" => Sm808::Interfaces::Demo,
               "text" => Sm808::Interfaces::Text
             }.fetch(i)

@@ -1,41 +1,43 @@
-require "sm_808/step_sequence"
+require "sm_808/sample"
+require "sm_808/step_counter"
 
 module Sm808
   class Song
     extend Forwardable
 
-    attr_reader :title, :samples, :step_sequence
+    attr_reader :title, :bpm, :samples, :counter, :step_duration
 
-    def initialize(bpm: 60, title: "Untitled")
+    def initialize(title: "Untitled", bpm: 60)
       @title = title
-      @samples = default_samples
-      @step_sequence = StepSequence.new(bpm)
+      @bpm = bpm
+      @samples = Sample.defaults
+      @counter = StepCounter.new
+      calculate_step_duration
     end
 
-    def_delegator :@step_sequence, :complete?
+    def_delegators :@counter, :complete?, :current_step
 
-    def play(num, &block)
-      step_sequence.step_through(num) do |step|
-        notes = sample(step)
-        yield step, notes
-      end
+    def add_sample(new_sample)
+      samples[new_sample.kind] = new_sample
+      counter.resequence!(new_sample.duration)
+      calculate_step_duration
     end
 
-    def add_sample(sample)
-      samples[sample.kind] = sample
-      step_sequence.resequence!(sample.duration)
-    end
-
-    def sample(step)
-      samples.map { |kind, sample| [kind, sample.note(step)] }.to_h
+    def sample
+      count = counter.next_step
+      samples.map do |kind, sample|
+        [kind, sample.step(count)]
+      end.to_h
     end
 
     private
 
-    def default_samples
-      Sample::Kinds::ALL.each_with_object({}) do |kind, samples|
-        samples[kind] = Sample.new(kind, Sample::INACTIVE_STEP)
-      end
+    attr_writer :step_duration
+
+    def calculate_step_duration
+      minute = 60.0
+      beats_per_bar = 4
+      self.step_duration = ((minute / bpm) * beats_per_bar) / counter.duration
     end
   end
 end

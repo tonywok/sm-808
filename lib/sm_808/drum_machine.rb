@@ -1,29 +1,47 @@
 require "sm_808/song"
-require "sm_808/sample"
 
 module Sm808
   class DrumMachine
-    attr_reader :bpm, :loops, :song, :step_sequence, :interface
+    extend Forwardable
 
-    def initialize(bpm: 60, loops: 4, title: "Unititled", interface: Interfaces::Text.new)
-      @loops = loops
-      @song = Song.new(bpm: bpm, title: title)
+    attr_reader :song, :interface
+
+    def initialize(interface: Interfaces::Text.new, **kwargs)
+      @song = Song.new(**kwargs)
       @interface = interface
+      pause
     end
 
+    def_delegators :@song, :bpm, :step_duration, :add_sample
+
     def playback
-      interface.on_start
-
-      song.play(loops) do |step, notes|
-        interface.on_step(step, notes)
-        interface.on_bar if song.complete?
+      playing do
+        sample
       end
-
       interface.on_finish
     end
 
-    def add_sample(sample)
-      song.add_sample(sample)
+    def pause
+      self.paused = true
+    end
+
+    private
+
+    attr_accessor :paused
+    alias_method :paused?, :paused
+
+    def playing
+      self.paused = false
+      until paused? || song.complete?
+        yield
+      end
+    end
+
+    def sample
+      steps = song.sample
+      sleep step_duration unless interface.test?
+      interface.on_step(song.current_step, steps)
+      interface.on_bar if song.complete?
     end
   end
 end

@@ -4,15 +4,26 @@ RSpec.describe Sm808::DrumMachine do
   let(:interface) { Sm808::Interfaces::Text.new }
   let(:drum_machine) { described_class.new(interface: interface) }
 
+  describe "#bpm" do
+    it "defaults to 60" do
+      expect(drum_machine.bpm).to eq(60)
+    end
+
+    it "can be changed" do
+      drum_machine = described_class.new(bpm: 128)
+      expect(drum_machine.bpm).to eq(128)
+    end
+  end
+
   describe "#playback" do
     context "with no samples" do
       it "plays all noop notes" do
         expect(drum_machine.playback).to eq(<<~TXT)
-          +---------------+
-          |0|0|0|0|0|0|0|0|
-          |0|0|0|0|0|0|0|0|
-          |0|0|0|0|0|0|0|0|
-          +---------------+
+                +---------------+
+          kick  |0|0|0|0|0|0|0|0|
+          snare |0|0|0|0|0|0|0|0|
+          hihat |0|0|0|0|0|0|0|0|
+                +---------------+
         TXT
       end
     end
@@ -28,11 +39,11 @@ RSpec.describe Sm808::DrumMachine do
 
       it "sequences both" do
         expect(drum_machine.playback).to eq(<<~TXT)
-          +---------------+
-          |X|0|0|0|X|0|0|0|
-          |0|X|X|X|0|X|X|X|
-          |0|0|0|0|0|0|0|0|
-          +---------------+
+                +---------------+
+          kick  |X|0|0|0|X|0|0|0|
+          snare |0|X|X|X|0|X|X|X|
+          hihat |0|0|0|0|0|0|0|0|
+                +---------------+
         TXT
       end
     end
@@ -50,11 +61,11 @@ RSpec.describe Sm808::DrumMachine do
 
       it "sequences both, restarting the shorter sample" do
         expect(drum_machine.playback).to eq(<<~TXT)
-          +-------------------------------+
-          |X|0|0|0|X|0|0|0|X|0|0|0|X|0|0|0|
-          |0|0|0|X|0|0|0|0|0|0|0|0|X|0|0|0|
-          |0|X|0|X|0|X|0|X|0|X|0|X|0|X|0|X|
-          +-------------------------------+
+                +-------------------------------+
+          kick  |X|0|0|0|X|0|0|0|X|0|0|0|X|0|0|0|
+          snare |0|0|0|X|0|0|0|0|0|0|0|0|X|0|0|0|
+          hihat |0|X|0|X|0|X|0|X|0|X|0|X|0|X|0|X|
+                +-------------------------------+
         TXT
       end
     end

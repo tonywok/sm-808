@@ -1,13 +1,13 @@
 module Sm808
   module Interfaces
-    class Text
+    class Text < Interface
       attr_reader :output
 
       def initialize
         @output = []
       end
 
-      def play_step(step, notes)
+      def on_step(step, notes)
         sampled_step = Sample::Kinds::ALL.map do |kind|
           notes[kind].active? ? "X" : "0"
         end
@@ -15,27 +15,33 @@ module Sm808
         sampled_step
       end
 
-      # +-----------------+
-      # |X|0|0|0|0|X|0|0|0|
-      # |0|0|0|0|0|0|0|0|0|
-      # |0|0|X|0|X|0|0|X|0|
-      # +-----------------+
+      #       +-----------------+
+      # kick  |X|0|0|0|0|X|0|0|0|
+      # snare |0|0|0|0|0|0|0|0|0|
+      # hihat |0|0|X|0|X|0|0|X|0|
+      #       +-----------------+
       def on_finish
-        divider = text_divider(output.length)
-        out = output.transpose(&:reverse).inject(divider) do |str, row|
+        padding = 6
+        divider = text_divider(output.length, padding)
+        out = output.transpose(&:reverse).each.with_object(divider).with_index do |(row, str), i|
+          str << Sample::Kinds::ALL[i].to_s.ljust(padding)
           str << "|"
           str << row.join("|")
           str << "|"
           str << "\n"
         end
-        out += text_divider(output.length)
+        out += text_divider(output.length, padding)
         out
+      end
+
+      def test?
+        true
       end
 
       private
 
-      def text_divider(length)
-        "+#{'-' * (length * 2 - 1)}+\n"
+      def text_divider(length, pad)
+        " " * pad + "+#{'-' * (length * 2 - 1)}+\n"
       end
     end
   end

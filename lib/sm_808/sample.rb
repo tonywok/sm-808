@@ -1,11 +1,7 @@
-require_relative "note"
-require "singleton"
+require_relative "step"
 
 module Sm808
   class Sample
-    ACTIVE_STEP = "X"
-    INACTIVE_STEP = "0"
-
     module Kinds
       ALL = [
         KICK = :kick,
@@ -14,27 +10,33 @@ module Sm808
       ]
     end
 
-    attr_reader :kind, :notes
+    def self.defaults
+      Kinds::ALL.each_with_object({}) do |kind, samples|
+        samples[kind] = Sample.new(kind, Step::INACTIVE)
+      end
+    end
+
+    attr_reader :kind, :steps
 
     def initialize(kind, pattern)
       @kind = kind
-      @notes = build_notes(pattern)
+      @steps = build_steps(pattern)
     end
 
-    def note(step_count)
-      notes[step_count % duration]
+    def step(step_count)
+      steps[step_count % duration]
     end
 
     def duration
-      notes.length
+      steps.length
     end
 
     private
 
-    def build_notes(pattern)
-      pattern = INACTIVE_STEP if pattern.empty?
+    def build_steps(pattern)
+      pattern = Step::INACTIVE if pattern.empty?
       pattern.split("").map do |indicator|
-        Note.new(kind, indicator == ACTIVE_STEP)
+        Step.new(kind, indicator == Step::ACTIVE)
       end
     end
   end

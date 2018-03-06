@@ -1,8 +1,9 @@
-require "singleton"
-
 module Sm808
-  class Note
+  class Step
     attr_reader :kind, :active
+
+    ACTIVE = "X"
+    INACTIVE = "0"
 
     def initialize(kind, active)
       @kind = kind
