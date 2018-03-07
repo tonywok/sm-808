@@ -14,7 +14,7 @@ module Sm808
       @interface = interface.new(self)
     end
 
-    def_delegators :@song, :bpm, :step_duration, :add_sample, :current_step
+    def_delegators :@song, :bpm, :step_duration, :add_pattern, :current_step
 
     def playback(num_loops = 1)
       num_loops.times do

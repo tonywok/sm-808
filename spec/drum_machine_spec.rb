@@ -16,7 +16,7 @@ RSpec.describe Sm808::DrumMachine do
   end
 
   describe "#playback" do
-    context "with no samples" do
+    context "with no patterns" do
       it "plays all noop notes" do
         expect(drum_machine.playback).to eq(<<~TXT)
                 +---------------+
@@ -28,13 +28,10 @@ RSpec.describe Sm808::DrumMachine do
       end
     end
 
-    context "with samples that have the same pattern length" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "0XXX0XXX") }
-
+    context "with patterns that have the same pattern length" do
       before do
-        drum_machine.add_sample(kick)
-        drum_machine.add_sample(snare)
+        drum_machine.add_pattern(:kick,  "X000X000")
+        drum_machine.add_pattern(:snare, "0XXX0XXX")
       end
 
       it "sequences both" do
@@ -48,15 +45,11 @@ RSpec.describe Sm808::DrumMachine do
       end
     end
 
-    context "with samples of varying pattern length" do
-      let(:kick)  { Sample.new(:kick,  "X000X000") }
-      let(:snare) { Sample.new(:snare, "000X00000000X000") }
-      let(:hihat) { Sample.new(:hihat, "0X") }
-
+    context "with patterns of varying pattern length" do
       before do
-        drum_machine.add_sample(kick)
-        drum_machine.add_sample(snare)
-        drum_machine.add_sample(hihat)
+        drum_machine.add_pattern(:kick, "X000X000")
+        drum_machine.add_pattern(:snare, "000X00000000X000")
+        drum_machine.add_pattern(:hihat, "0X")
       end
 
       it "sequences both, restarting the shorter sample" do

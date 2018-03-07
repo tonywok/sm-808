@@ -35,40 +35,34 @@ RSpec.describe Sm808::Song do
     end
 
     context "upon adding a sample with more steps" do
-      let(:kick) { Sample.new(:kick, "X000X000X000X000") }
-
       it "recalculates" do
-        song.add_sample(kick)
+        song.add_pattern(:kick, "X000X000X000X000")
         expect(song.step_duration).to eq(0.25)
       end
     end
   end
 
-  describe "#samples" do
-    it "has all samples" do
-      expect(song.samples.keys).to eq(Sample::Kinds::ALL)
+  describe "#patterns" do
+    it "has all patterns" do
+      expect(song.patterns.keys).to eq(Pattern::Kinds::ALL)
     end
   end
 
-  describe "#add_sample" do
-    let(:kick) { Sample.new(:kick, "X000X000") }
-
-    it "replaces the default inactive samples" do
-      song.add_sample(kick)
-      expect(song.samples[:kick]).to be(kick)
+  describe "#add_pattern" do
+    it "replaces the default noop pattern" do
+      expect(song.sample[:kick]).not_to be_active
+      song.rewind
+      song.add_pattern(:kick, "X000X000")
+      expect(song.sample[:kick]).to be_active
     end
   end
 
   describe "#sample" do
-    let(:kick)  { Sample.new(:kick,  "X000X000") }
-    let(:snare) { Sample.new(:snare, "0000X000") }
-    let(:hihat) { Sample.new(:hihat, "00X000X0") }
-
-    context "bunch of custom samples" do
+    context "bunch of custom patterns" do
       before do
-        song.add_sample(kick)
-        song.add_sample(snare)
-        song.add_sample(hihat)
+        song.add_pattern(:kick,  "X000X000")
+        song.add_pattern(:snare, "0000X000")
+        song.add_pattern(:hihat, "00X000X0")
       end
 
       it "extracts steps from each sample" do
@@ -87,7 +81,7 @@ RSpec.describe Sm808::Song do
       end
     end
 
-    context "no user defined samples" do
+    context "no user defined patterns" do
       it "only has inactive notes" do
         steps = song.sample
         expect(steps[:kick]).not_to be_active

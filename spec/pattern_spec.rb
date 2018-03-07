@@ -1,15 +1,15 @@
 require "spec_helper"
 
-RSpec.describe Sm808::Sample do
+RSpec.describe Sm808::Pattern do
   let(:sample) { described_class.new(:snare, pattern) }
 
   describe ".defaults" do
-    it "creates all samples with inactive steps" do
-      samples = described_class.defaults
-      expect(samples.length).to eq(3)
-      expect(samples[described_class::Kinds::KICK].step(0)).not_to be_active
-      expect(samples[described_class::Kinds::SNARE].step(0)).not_to be_active
-      expect(samples[described_class::Kinds::HIHAT].step(0)).not_to be_active
+    it "creates all patterns with inactive steps" do
+      patterns = described_class.defaults
+      expect(patterns.length).to eq(3)
+      expect(patterns[described_class::Kinds::KICK].step(0)).not_to be_active
+      expect(patterns[described_class::Kinds::SNARE].step(0)).not_to be_active
+      expect(patterns[described_class::Kinds::HIHAT].step(0)).not_to be_active
     end
   end
 

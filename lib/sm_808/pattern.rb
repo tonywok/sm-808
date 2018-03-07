@@ -1,7 +1,7 @@
 require_relative "step"
 
 module Sm808
-  class Sample
+  class Pattern
     module Kinds
       ALL = [
         KICK = :kick,
@@ -11,16 +11,16 @@ module Sm808
     end
 
     def self.defaults
-      Kinds::ALL.each_with_object({}) do |kind, samples|
-        samples[kind] = Sample.new(kind, Step::INACTIVE)
+      Kinds::ALL.each_with_object({}) do |kind, patterns|
+        patterns[kind] = Pattern.new(kind, Step::INACTIVE)
       end
     end
 
     attr_reader :kind, :steps
 
-    def initialize(kind, pattern)
+    def initialize(kind, steps)
       @kind = kind
-      @steps = build_steps(pattern)
+      @steps = build_steps(steps)
     end
 
     def step(step_count)
