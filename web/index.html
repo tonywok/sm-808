@@ -1,11 +1,24 @@
+<!DOCTYPE html>
+<!--
+  An intentionally minimal web interface.
+  Complete with inlined css and javascript.
+  This is by no means an endorsement of this
+  practice, but rather a way of indicating
+  that my focus was with modeling the sm808.
+
+  That said, I did take the time to find some
+  awesome super retro looking ascii art.
+
+  <3 Tony :)
+-->
 <html>
   <head>
     <style>
-    body {
-      font-family: monospace;
-      text-align: center;
-      margin: 200px auto;
-    }
+      body {
+        font-family: monospace;
+        text-align: center;
+        margin: 200px auto;
+      }
     </style>
   </head>
 
@@ -94,6 +107,8 @@
               });
             });
           }
+          // TODO:
+          // onStart - dynamically build interface based on drum machine settings
 
           // Websocket events
           //
@@ -120,6 +135,9 @@
           return {
             play: function() { send("play") },
             pause: function() { send("pause") },
+            // TODO:
+            // toggleStep
+            // updatePatternDuration
           };
         }());
       };

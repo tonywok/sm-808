@@ -1,5 +1,8 @@
 module Sm808
   module Interfaces
+    # To be used in tandem with a drum machine as
+    # an output interface.
+    #
     class Interface
       attr_reader :drum_machine
 
@@ -7,14 +10,21 @@ module Sm808
         @drum_machine = drum_machine
       end
 
+      # Hook to perform any initial startup commands
+      #
       def on_start; end
-      def on_step(step_count, steps); end
-      def on_bar; end
-      def on_finish; end
 
-      def test?
-        false
-      end
+      # Indicate the sampling of a step within the song
+      #
+      def on_step(step_count, steps); end
+
+      # Indicate the completion of a bar within the song
+      #
+      def on_bar; end
+
+      # Indicate the completion of a song's playback
+      #
+      def on_finish; end
     end
   end
 end

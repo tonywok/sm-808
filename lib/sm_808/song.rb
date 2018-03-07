@@ -15,7 +15,7 @@ module Sm808
       calculate_step_duration
     end
 
-    def_delegators :@counter, :complete?, :current_step
+    def_delegators :@counter, :end_of_bar?, :current_step, :rewind
 
     def add_sample(new_sample)
       samples[new_sample.kind] = new_sample
@@ -34,6 +34,7 @@ module Sm808
 
     attr_writer :step_duration
 
+    # TODO: variable time signature
     def calculate_step_duration
       minute = 60.0
       beats_per_bar = 4

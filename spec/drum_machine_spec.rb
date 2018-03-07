@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Sm808::DrumMachine do
-  let(:interface) { Sm808::Interfaces::Text }
+  let(:interface) { Sm808::Interfaces::Test }
   let(:drum_machine) { described_class.new(interface: interface) }
 
   describe "#bpm" do
@@ -10,7 +10,7 @@ RSpec.describe Sm808::DrumMachine do
     end
 
     it "can be changed" do
-      drum_machine = described_class.new(bpm: 128)
+      drum_machine = described_class.new(interface: interface, bpm: 128)
       expect(drum_machine.bpm).to eq(128)
     end
   end

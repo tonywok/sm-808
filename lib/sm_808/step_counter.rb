@@ -1,4 +1,7 @@
 module Sm808
+  # The step counter is responsible for determing the next step
+  # to be sampled.
+  #
   class StepCounter
     attr_reader :duration
 
@@ -13,16 +16,19 @@ module Sm808
       self.current_step = sequence.next
     end
 
-    def complete?
+    def end_of_bar?
       sequence.peek.zero? && !current_step.zero?
     end
 
-    def resequence!(sample_duration)
-      return unless sample_duration > duration
+    # Update our internal sequence to accomodate a newly
+    # added pattern that is of greater length.
+    #
+    def resequence!(pattern_duration)
+      return unless pattern_duration > duration
 
       sequence.peek.tap do |upcoming_step|
-        upcoming_step = duration + 1 if complete?
-        self.sequence = build_sequence(sample_duration)
+        upcoming_step = duration + 1 if end_of_bar?
+        self.sequence = build_sequence(pattern_duration)
         fast_forward(upcoming_step)
       end
     end

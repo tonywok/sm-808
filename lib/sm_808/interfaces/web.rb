@@ -3,11 +3,13 @@ require "em-websocket"
 
 module Sm808
   module Interfaces
+    # Starts a websocket server to communicate with web client.
+    #
     class Web < Interface
       attr_accessor :socket
 
       def on_start
-        greeting
+        print_instructions
         EM.run do
           EM::WebSocket.run(:host => "0.0.0.0", :port => 8080) do |ws|
             self.socket = ws
@@ -32,8 +34,11 @@ module Sm808
         case command.to_sym
         when :play then play
         when :pause then pause
+        # TODO:
+        #   toggle_sample
+        #   update_sample_duration
         else
-          raise "command not supported"
+          raise "command: #{command} not supported"
         end
       end
 
@@ -53,7 +58,7 @@ module Sm808
         @play_timer.cancel
       end
 
-      def greeting
+      def print_instructions
         html_file = File.expand_path("web/index.html")
         puts "please point your browser to file://#{html_file}"
       end

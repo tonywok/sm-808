@@ -23,15 +23,15 @@ RSpec.describe Sm808::StepCounter do
     end
   end
 
-  describe "#complete?" do
-    it { expect(counter).not_to be_complete }
+  describe "#end_of_bar?" do
+    it { expect(counter).not_to be_end_of_bar }
 
-    context "upon stepping till completion" do
+    context "upon stepping till end of bar" do
       before do
         counter.duration.times { counter.next_step }
       end
 
-      it { expect(counter).to be_complete }
+      it { expect(counter).to be_end_of_bar }
     end
   end
 

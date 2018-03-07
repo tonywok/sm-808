@@ -2,6 +2,7 @@ require "optparse"
 
 module Sm808
   module Interfaces
+    # Super minimal command line parser using ruby's stdlib OptionParser
     class Parser
       def self.parse(options)
         args = {
@@ -19,17 +20,12 @@ module Sm808
             args[:bpm] = b.to_i
           end
 
-          opts.on("-i", "--interface=INTERFACE", "Available output interfaces (default: curses)") do |i|
+          opts.on("-i", "--interface=INTERFACE", "Available output interfaces: cli, web (default)") do |i|
             interface_strategy = {
-              "text" => Sm808::Interfaces::Text,
-              "demo" => Sm808::Interfaces::Demo,
+              "cli" => Sm808::Interfaces::Cli,
               "web" => Sm808::Interfaces::Web,
             }.fetch(i)
             args[:interface] = interface_strategy
-          end
-
-          opts.on("-l", "--loops", "Number of playback loops (default: 4)") do |l|
-            args[:loops] = l
           end
 
           opts.on("-v", "--version", "Version of sm_808") do |v|
