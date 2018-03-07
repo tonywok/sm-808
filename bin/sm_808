@@ -11,4 +11,4 @@ sm808 = Sm808::DrumMachine.new(options)
 sm808.add_sample(Sm808::Sample.new(:kick,  "X000X000"))
 sm808.add_sample(Sm808::Sample.new(:snare, "0000X000"))
 sm808.add_sample(Sm808::Sample.new(:hihat, "00X000X0"))
-sm808.playback
+sm808.interface.on_start

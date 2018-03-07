@@ -4,12 +4,11 @@ module Sm808
   class DrumMachine
     extend Forwardable
 
-    attr_reader :song, :interface
+    attr_reader :song, :interface, :queue
 
-    def initialize(interface: Interfaces::Text.new, **kwargs)
+    def initialize(interface: Interfaces::Text, **kwargs)
       @song = Song.new(**kwargs)
-      @interface = interface
-      pause
+      @interface = interface.new(self)
     end
 
     def_delegators :@song, :bpm, :step_duration, :add_sample
@@ -21,8 +20,10 @@ module Sm808
       interface.on_finish
     end
 
-    def pause
-      self.paused = true
+    def sample
+      steps = song.sample
+      interface.on_step(song.current_step, steps)
+      interface.on_bar if song.complete?
     end
 
     private
@@ -35,13 +36,6 @@ module Sm808
       until paused? || song.complete?
         yield
       end
-    end
-
-    def sample
-      steps = song.sample
-      sleep step_duration unless interface.test?
-      interface.on_step(song.current_step, steps)
-      interface.on_bar if song.complete?
     end
   end
 end

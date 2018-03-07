@@ -3,7 +3,8 @@ module Sm808
     class Text < Interface
       attr_reader :output
 
-      def initialize
+      def initialize(drum_machine)
+        super
         @output = []
       end
 

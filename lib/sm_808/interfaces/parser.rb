@@ -5,7 +5,7 @@ module Sm808
     class Parser
       def self.parse(options)
         args = {
-          interface: Sm808::Interfaces::Demo.new,
+          interface: Sm808::Interfaces::Web
         }
 
         opt_parser = OptionParser.new do |opts|
@@ -21,10 +21,11 @@ module Sm808
 
           opts.on("-i", "--interface=INTERFACE", "Available output interfaces (default: curses)") do |i|
             interface_strategy = {
+              "text" => Sm808::Interfaces::Text,
               "demo" => Sm808::Interfaces::Demo,
-              "text" => Sm808::Interfaces::Text
+              "web" => Sm808::Interfaces::Web,
             }.fetch(i)
-            args[:interface] = interface_strategy.new
+            args[:interface] = interface_strategy
           end
 
           opts.on("-l", "--loops", "Number of playback loops (default: 4)") do |l|

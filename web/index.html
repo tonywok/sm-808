@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <style>
+    body {
+      font-family: monospace;
+      text-align: center;
+      margin: 200px auto;
+    }
+    </style>
+  </head>
+
+  <body onload="init();">
+    <pre>
+      ::::::::    :::   :::    ::::::::   :::::::   :::::::: 
+    :+:    :+:  :+:+: :+:+:  :+:    :+: :+:   :+: :+:    :+: 
+   +:+        +:+ +:+:+ +:+ +:+    +:+ +:+   +:+ +:+    +:+  
+  +#++:++#++ +#+  +:+  +#+  +#++:++#  +#+   +:+  +#++:++#    
+        +#+ +#+       +#+ +#+    +#+ +#+   +#+ +#+    +#+    
+#+#    #+# #+#       #+# #+#    #+# #+#   #+# #+#    #+#     
+########  ###       ###  ########   #######   ########       
+    </pre>
+    <table align="center">
+      <thead>
+        <tr>
+          <th>Sample</th>
+          <th>0</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+          <th>6</th>
+          <th>7</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="kick">
+          <td>Kick</td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+        </tr>
+        <tr id="snare">
+          <td>Snare</td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+        </tr>
+        <tr id="hihat">
+          <td>Hihat</td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+          <td><input type="checkbox"/></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button onclick="window.sm808.play()">Play</button>
+    <button onclick="window.sm808.pause()">Pause</button>
+
+    <script>
+      function init() {
+        window.sm808 = (function() {
+          // sm808
+          //
+          function onStep(data) {
+            var stepCount = data["count"];
+            var steps = data["steps"];
+
+            Object.keys(steps).forEach(function(key) {
+              var tr = document.getElementById(key)
+              tr.querySelectorAll("input[type=checkbox]").forEach(function(checkbox, i) {
+                if (i === stepCount) {
+                  checkbox.disabled = true;
+                  checkbox.checked = steps[key];
+                } else {
+                  checkbox.disabled = false;
+                }
+              });
+            });
+          }
+
+          // Websocket events
+          //
+          var ws = new WebSocket("ws://localhost:8080");
+
+          function onMessage(evt) {
+            var data = JSON.parse(evt.data)
+            var command = data["command"];
+            if (command === "onStep") onStep(data);
+          };
+          function onOpen(event) {
+            console.log("connected...");
+          };
+          function onClose(event) {
+            console.log("closed");
+          };
+          function send(msg) {
+            return ws.send(JSON.stringify({ "command" : msg }));
+          }
+          ws.onmessage = onMessage;
+          ws.onclose = onClose;
+          ws.onopen = onOpen;
+
+          return {
+            play: function() { send("play") },
+            pause: function() { send("pause") },
+          };
+        }());
+      };
+    </script>
+  </body>
+</html>

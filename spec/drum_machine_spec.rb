@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe Sm808::DrumMachine do
-  let(:interface) { Sm808::Interfaces::Text.new }
+  let(:interface) { Sm808::Interfaces::Text }
   let(:drum_machine) { described_class.new(interface: interface) }
 
   describe "#bpm" do
