@@ -5,6 +5,14 @@ require "sm_808/drum_machine"
 require "singleton"
 
 module Sm808
+  module Samples
+    ALL = [
+      KICK = :kick,
+      SNARE = :snare,
+      HIHAT = :hihat,
+    ]
+  end
+
   class InactiveStep
     include Singleton
 

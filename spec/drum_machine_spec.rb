@@ -30,8 +30,8 @@ RSpec.describe Sm808::DrumMachine do
 
     context "with patterns that have the same pattern length" do
       before do
-        drum_machine.add_pattern(:kick,  "X000X000")
-        drum_machine.add_pattern(:snare, "0XXX0XXX")
+        drum_machine.update_pattern(:kick,  "X000X000")
+        drum_machine.update_pattern(:snare, "0XXX0XXX")
       end
 
       it "sequences both" do
@@ -47,9 +47,9 @@ RSpec.describe Sm808::DrumMachine do
 
     context "with patterns of varying pattern length" do
       before do
-        drum_machine.add_pattern(:kick, "X000X000")
-        drum_machine.add_pattern(:snare, "000X00000000X000")
-        drum_machine.add_pattern(:hihat, "0X")
+        drum_machine.update_pattern(:kick, "X000X000")
+        drum_machine.update_pattern(:snare, "000X00000000X000")
+        drum_machine.update_pattern(:hihat, "0X")
       end
 
       it "sequences both, restarting the shorter sample" do

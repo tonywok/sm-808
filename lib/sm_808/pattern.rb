@@ -1,34 +1,18 @@
 module Sm808
+  # A pattern is a sequence of steps, either active or inactive for a particular sample.
+  #
   class Pattern
-    module Kinds
-      ALL = [
-        KICK = :kick,
-        SNARE = :snare,
-        HIHAT = :hihat,
-      ]
-    end
-
     def self.defaults
-      Kinds::ALL.each_with_object({}) do |kind, patterns|
-        patterns[kind] = Pattern.new(kind, InactiveStep::INDICATOR)
+      Samples::ALL.each_with_object({}) do |sample, patterns|
+        patterns[sample] = Pattern.new(sample, InactiveStep::INDICATOR)
       end
     end
 
-    def self.active_step
-      ActiveStep.instance
-    end
+    attr_reader :sample, :steps
 
-    def self.inactive_step
-      InactiveStep.instance
-    end
-
-    attr_reader :kind, :steps
-
-    def initialize(kind, step_indicators)
-      @kind = kind
-      @steps = step_indicators.split("").map do |indicator|
-        step_for_indicator(indicator)
-      end
+    def initialize(sample, step_indicators)
+      @sample = sample
+      @steps = add_steps(step_indicators)
     end
 
     def step(step_count)
@@ -39,13 +23,27 @@ module Sm808
       steps.length
     end
 
+    # Updates the pattern's step at step index to be active/inactive
+    # Attempts to update an out of bounds step will grow pattern to accomodate
+    #
     def update_step(step_index, active)
       fill_to = (step_index + 1) - duration
       steps.fill(duration, fill_to) { InactiveStep.instance }
       steps[step_index] = step_for(active)
     end
 
+    # Converts the handy string representation of step indicators into actual
+    # steps.
+    #
+    def add_steps(step_indicators)
+      self.steps = step_indicators.split("").map do |indicator|
+        step_for_indicator(indicator)
+      end
+    end
+
     private
+
+    attr_writer :steps
 
     def step_for(active)
       if active

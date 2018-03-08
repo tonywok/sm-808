@@ -6,7 +6,11 @@ module Sm808
     # Starts a websocket server to communicate with web client.
     #
     class Web < Interface
+      extend Forwardable
+
       attr_accessor :socket
+
+      def_delegator :@drum_machine, :song
 
       def on_start
         print_instructions
@@ -23,20 +27,22 @@ module Sm808
         send_message(
           command: "onStep",
           count: count,
-          steps: steps.map { |kind, step| [kind, step.active?] }.to_h,
+          steps: steps.map { |sample, step| [sample, step.active?] }.to_h,
         )
       end
 
       private
 
-      def read_message(msg)
-        command = JSON.parse(msg)["command"]
+      def read_message(data)
+        message = JSON.parse(data)
+        command = message["command"]
+        args = message["args"]
+
         case command.to_sym
         when :play then play
         when :pause then pause
-        # TODO:
-        #   toggle_sample
-        #   update_sample_duration
+        when :toggle_step then toggle_step(args)
+        # TODO: update_sample_duration
         else
           raise "command: #{command} not supported"
         end

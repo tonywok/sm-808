@@ -43,6 +43,11 @@ module Sm808
     attr_accessor :sequence, :current_step
     attr_writer :duration
 
+    # Constructs a lazy enumerator and captures the step count
+    # as the duration. Went back and forth about whether or not
+    # I should just not make this cycle -- not having to think
+    # about the cycle is nice.
+    #
     def build_sequence(step_count)
       self.duration = step_count
       (0...duration).lazy.cycle

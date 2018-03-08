@@ -36,7 +36,7 @@ RSpec.describe Sm808::Song do
 
     context "upon adding a sample with more steps" do
       it "recalculates" do
-        song.add_pattern(:kick, "X000X000X000X000")
+        song.update_pattern(:kick, "X000X000X000X000")
         expect(song.step_duration).to eq(0.25)
       end
     end
@@ -44,15 +44,15 @@ RSpec.describe Sm808::Song do
 
   describe "#patterns" do
     it "has all patterns" do
-      expect(song.patterns.keys).to eq(Pattern::Kinds::ALL)
+      expect(song.patterns.keys).to eq(Samples::ALL)
     end
   end
 
-  describe "#add_pattern" do
+  describe "#update_pattern" do
     it "replaces the default noop pattern" do
       expect(song.sample[:kick]).not_to be_active
       song.rewind
-      song.add_pattern(:kick, "X000X000")
+      song.update_pattern(:kick, "X000X000")
       expect(song.sample[:kick]).to be_active
     end
   end
@@ -60,9 +60,9 @@ RSpec.describe Sm808::Song do
   describe "#sample" do
     context "bunch of custom patterns" do
       before do
-        song.add_pattern(:kick,  "X000X000")
-        song.add_pattern(:snare, "0000X000")
-        song.add_pattern(:hihat, "00X000X0")
+        song.update_pattern(:kick,  "X000X000")
+        song.update_pattern(:snare, "0000X000")
+        song.update_pattern(:hihat, "00X000X0")
       end
 
       it "extracts steps from each sample" do

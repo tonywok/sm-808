@@ -2,6 +2,8 @@ require "sm_808/pattern"
 require "sm_808/step_counter"
 
 module Sm808
+  # A song is responsible for sequencing multiple patterns for different samples
+  #
   class Song
     extend Forwardable
 
@@ -17,25 +19,35 @@ module Sm808
 
     def_delegators :@counter, :end_of_bar?, :current_step, :rewind
 
-    def add_pattern(kind, steps)
-      new_sample = Pattern.new(kind, steps)
-      patterns[new_sample.kind] = new_sample
-      counter.resequence!(new_sample.duration)
-      calculate_step_duration
+    def update_pattern(sample, step_indicators)
+      pattern(sample).tap do |p|
+        p.add_steps(step_indicators)
+        counter.resequence!(p.duration)
+        calculate_step_duration
+      end
     end
 
+    # Returns a hash of sample to patterns sequenced for the next step
+    #
     def sample
       count = counter.next_step
-      patterns.map do |kind, sample|
-        [kind, sample.step(count)]
+      patterns.map do |sample, pattern|
+        [sample, pattern.step(count)]
       end.to_h
+    end
+
+    def pattern(sample)
+      patterns.fetch(sample.to_sym) do
+        raise "sm808 doesn't yet support #{sample}"
+      end
     end
 
     private
 
     attr_writer :step_duration
 
-    # TODO: variable time signature
+    # Pulling this out into a method since the step duration can change as a result of
+    # the counter duration or BPM changing (e.g adding variable pattern durations)
     def calculate_step_duration
       minute = 60.0
       beats_per_bar = 4

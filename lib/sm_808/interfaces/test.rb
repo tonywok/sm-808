@@ -28,7 +28,7 @@ module Sm808
         left_padding = 6
         divider = text_divider(output.length, left_padding)
         out = output.transpose(&:reverse).each.with_object(divider).with_index do |(row, str), i|
-          str << Pattern::Kinds::ALL[i].to_s.ljust(left_padding)
+          str << Samples::ALL[i].to_s.ljust(left_padding)
           str << "|"
           str << row.join("|")
           str << "|"

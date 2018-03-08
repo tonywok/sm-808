@@ -7,9 +7,9 @@ RSpec.describe Sm808::Pattern do
     it "creates all patterns with inactive steps" do
       patterns = described_class.defaults
       expect(patterns.length).to eq(3)
-      expect(patterns[described_class::Kinds::KICK].step(0)).not_to be_active
-      expect(patterns[described_class::Kinds::SNARE].step(0)).not_to be_active
-      expect(patterns[described_class::Kinds::HIHAT].step(0)).not_to be_active
+      expect(patterns[Samples::KICK].step(0)).not_to be_active
+      expect(patterns[Samples::SNARE].step(0)).not_to be_active
+      expect(patterns[Samples::HIHAT].step(0)).not_to be_active
     end
   end
 

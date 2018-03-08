@@ -3,6 +3,7 @@ require "optparse"
 module Sm808
   module Interfaces
     # Super minimal command line parser using ruby's stdlib OptionParser
+    #
     class Parser
       def self.parse(options)
         args = {
