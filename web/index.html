@@ -88,15 +88,34 @@
 
     <script>
       function init() {
-        window.sm808 = (function() {
+        window.sm808 = (function(doc) {
           // sm808
           //
+          function onStart(data) {
+            // TODO:
+            // dynamically build interface based on drum machine settings
+            // extract this sample -> step looping mechanism into function
+            //
+            ["kick", "snare", "hihat"].forEach(function(sample) {
+              var tr = doc.getElementById(sample)
+              tr.querySelectorAll("input[type=checkbox]").forEach(function(checkbox, i) {
+                checkbox.onchange = function(e) {
+                  send("toggle_step", {
+                    "step_index" : i,
+                    "sample" : sample,
+                    "active" : checkbox.checked,
+                  });
+                };
+              })
+            });
+          }
+
           function onStep(data) {
             var stepCount = data["count"];
             var steps = data["steps"];
 
             Object.keys(steps).forEach(function(key) {
-              var tr = document.getElementById(key)
+              var tr = doc.getElementById(key)
               tr.querySelectorAll("input[type=checkbox]").forEach(function(checkbox, i) {
                 if (i === stepCount) {
                   checkbox.disabled = true;
@@ -107,26 +126,20 @@
               });
             });
           }
-          // TODO:
-          // onStart - dynamically build interface based on drum machine settings
 
           // Websocket events
           //
           var ws = new WebSocket("ws://localhost:8080");
 
-          function onMessage(evt) {
-            var data = JSON.parse(evt.data)
+          function onOpen(event) { onStart(event) };
+          function onClose(event) { console.log("closed") };
+          function onMessage(event) {
+            var data = JSON.parse(event.data)
             var command = data["command"];
             if (command === "onStep") onStep(data);
           };
-          function onOpen(event) {
-            console.log("connected...");
-          };
-          function onClose(event) {
-            console.log("closed");
-          };
-          function send(msg) {
-            return ws.send(JSON.stringify({ "command" : msg }));
+          function send(command, args = {}) {
+            return ws.send(JSON.stringify({ "command" : command, "args" : args }));
           }
           ws.onmessage = onMessage;
           ws.onclose = onClose;
@@ -136,10 +149,9 @@
             play: function() { send("play") },
             pause: function() { send("pause") },
             // TODO:
-            // toggleStep
             // updatePatternDuration
           };
-        }());
+        }(document));
       };
     </script>
   </body>

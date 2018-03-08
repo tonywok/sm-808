@@ -53,6 +53,14 @@ module Sm808
         socket.send(payload)
       end
 
+      def toggle_step(args)
+        pattern = song.pattern(args.fetch("sample"))
+        pattern.update_step(
+          args.fetch("step_index"),
+          args.fetch("active"),
+        )
+      end
+
       def play
         @play_timer = EM.add_periodic_timer(drum_machine.step_duration) do
           drum_machine.sample
