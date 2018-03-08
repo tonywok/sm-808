@@ -14,10 +14,7 @@ module Sm808
       # Collect samples for a given step to be displayed upon completion of song
       #
       def on_step(_step_count, steps)
-        sampled_steps = Pattern::Kinds::ALL.map do |kind|
-          steps[kind].active? ? Step::ACTIVE : Step::INACTIVE
-        end
-        output << sampled_steps
+        output << steps.values.map(&:indicator)
       end
 
       # Outputs a simple ascii diagram for easy assertion

@@ -9,13 +9,13 @@ module Sm808
       end
 
       def on_step(count, steps)
-        active_steps = steps.values.select(&:active?)
+        active_steps = steps.select { |_, step| step.active? }.to_h
 
         print "|"
         if active_steps.empty?
           print "_"
         else
-          print active_steps.map(&:kind).join("+")
+          print active_steps.keys.join("+")
         end
 
         sleep drum_machine.step_duration
