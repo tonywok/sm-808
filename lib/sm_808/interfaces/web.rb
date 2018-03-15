@@ -12,13 +12,24 @@ module Sm808
 
       def_delegator :@drum_machine, :song
 
+      def initialize(*args)
+        super
+        self.paused = true
+      end
+
       def on_start
         print_instructions
         EM.run do
+          # Start websocket server
           EM::WebSocket.run(:host => "0.0.0.0", :port => 8080) do |ws|
             self.socket = ws
             ws.onclose { puts "Connection closed" }
             ws.onmessage { |msg| read_message(msg) }
+          end
+
+          # Schedule sample playback
+          EM.add_periodic_timer(drum_machine.step_duration) do
+            drum_machine.sample unless paused?
           end
         end
       end
@@ -32,6 +43,9 @@ module Sm808
       end
 
       private
+
+      attr_accessor :paused
+      alias_method :paused?, :paused
 
       def read_message(data)
         message = JSON.parse(data)
@@ -62,14 +76,11 @@ module Sm808
       end
 
       def play
-        @play_timer = EM.add_periodic_timer(drum_machine.step_duration) do
-          drum_machine.sample
-        end
+        self.paused = false
       end
 
       def pause
-        return unless defined?(@play_timer)
-        @play_timer.cancel
+        self.paused = true
       end
 
       def print_instructions
